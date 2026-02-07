@@ -196,20 +196,9 @@ export default function SignIn() {
                     </form>
                 </div>
 
-                <div className="w-full max-w-[350px] mt-4 flex items-center">
-                    <div className="flex-grow border-t border-gray-300"></div>
-                    <span className="px-2 text-xs text-gray-400">New to Brands Hub 49?</span>
-                    <div className="flex-grow border-t border-gray-300"></div>
-                </div>
-
-                <button
-                    className="w-full max-w-[350px] mt-4 border border-gray-300 rounded-sm py-1 shadow-sm bg-gray-100 hover:bg-gray-200 text-sm"
-                    onClick={() => alert("Sign up functionality not implemented in this demo.")}
-                >
-                    Create your account
-                </button>
 
                 <div className="w-full max-w-[350px] mt-4 border-t border-gray-200 pt-4">
+
                     {/* Google Sign In option */}
                     <div className="flex flex-col items-center space-y-2">
                         <p className="text-xs text-gray-500 mb-2">Or sign in with</p>
