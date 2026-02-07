@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand_mint: #D1FAE5;
+  --color-brand_mint-dark: #10B981;
+  --color-brand_dark: #064E3B;
+  --color-brand_bg: #F3F4F6;
+  --color-brand_yellow: #FEBD69;
+  /* Keeping for buttons/accents if needed, or replace */
+  /* Mapping old names to new values for easier refactor if needed, or better just replace usage */
+  --color-amazon_blue: #064E3B;
+  /* Dark Emerald */
+  --color-amazon_blue-light: #047857;
+  /* Emerald 700 */
+  --color-amazon_blue-lighter: #059669;
+  /* Emerald 600 */
+  --color-amazon_bg: #F3F4F6;
+  --color-amazon_yellow: #D1FAE5;
+  /* Mint for search */
+  --color-amazon_orange: #10B981;
+  /* Emerald for buttons */
+  --color-amazon_link: #059669;
+}
+
+body {
+  background-color: var(--color-amazon_bg);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
