@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const getStripe = () => {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    if (!secretKey) {
+        throw new Error("STRIPE_SECRET_KEY is not defined in environment variables");
+    }
+    return new Stripe(secretKey);
+};
 
 export async function POST(req: NextRequest) {
     try {
@@ -20,6 +26,7 @@ export async function POST(req: NextRequest) {
             quantity: 1, // Assuming quantity 1 for now as cart doesn't track quantity per item yet
         }));
 
+        const stripe = getStripe();
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             shipping_address_collection: {
