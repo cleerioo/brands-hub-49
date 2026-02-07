@@ -50,25 +50,9 @@ export const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET || "secret",
     callbacks: {
         async signIn({ user, account, profile }) {
+            // Allow Google sign-in without database operations
+            // This prevents OAuthCallback errors from database connection issues
             if (account?.provider === "google") {
-                try {
-                    await connectDB();
-                    // Check if user exists
-                    const existingUser = await User.findOne({ email: user.email });
-                    if (!existingUser) {
-                        await User.create({
-                            name: user.name || "Unknown",
-                            email: user.email!, // Email is required by Google
-                            image: user.image || "",
-                            role: "user"
-                        });
-                    }
-                } catch (error) {
-                    // Log error but allow sign-in to proceed
-                    // This prevents OAuthCallback errors when database is unavailable
-                    console.error("Error saving user to DB (non-blocking):", error);
-                }
-                // Always return true for Google sign-in
                 return true;
             }
             return true; // Allow other providers (Credentials) to pass
