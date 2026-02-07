@@ -63,11 +63,13 @@ export const authOptions: NextAuthOptions = {
                             role: "user"
                         });
                     }
-                    return true;
                 } catch (error) {
-                    console.log("Error saving user to DB", error);
-                    return false;
+                    // Log error but allow sign-in to proceed
+                    // This prevents OAuthCallback errors when database is unavailable
+                    console.error("Error saving user to DB (non-blocking):", error);
                 }
+                // Always return true for Google sign-in
+                return true;
             }
             return true; // Allow other providers (Credentials) to pass
         },
