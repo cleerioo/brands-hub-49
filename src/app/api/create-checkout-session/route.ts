@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        return NextResponse.json({ id: session.id });
+        return NextResponse.json({ id: session.id, url: session.url });
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

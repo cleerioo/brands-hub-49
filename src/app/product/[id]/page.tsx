@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Star, ShoppingCart, MapPin, ChevronLeft } from "lucide-react";
@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 
 export default function ProductPage() {
     const params = useParams();
+    const router = useRouter();
     const { addToCart } = useCart();
 
     // Handle potential standard/array param types safely
@@ -31,6 +32,12 @@ export default function ProductPage() {
     const handleAddToCart = () => {
         addToCart(product);
         toast.success("Added to Cart");
+    };
+
+    const handleBuyNow = () => {
+        addToCart(product);
+        toast.success("Proceeding to Checkout");
+        router.push("/checkout");
     };
 
     return (
@@ -127,7 +134,10 @@ export default function ProductPage() {
                             >
                                 Add to Cart
                             </button>
-                            <button className="w-full bg-amazon_orange border border-yellow-600 rounded-full py-2 shadow-sm hover:bg-orange-500 focus:ring-2 focus:ring-orange-600 text-sm">
+                            <button
+                                onClick={handleBuyNow}
+                                className="w-full bg-amazon_orange border border-yellow-600 rounded-full py-2 shadow-sm hover:bg-orange-500 focus:ring-2 focus:ring-orange-600 text-sm"
+                            >
                                 Buy Now
                             </button>
                         </div>

@@ -137,12 +137,11 @@ function Checkout() {
                 // We'll persist order locally as 'Processing' to show immediate feedback?
                 // Actually, let's stick to standard flow: Redirect to Stripe.
 
-                const result = await (stripe as any)?.redirectToCheckout({
-                    sessionId: checkoutSession.id,
-                });
-
-                if (result?.error) {
-                    toast.error(result.error.message || "Something went wrong");
+                // Redirect to Stripe Checkout using the URL from the API
+                if (checkoutSession.url) {
+                    window.location.href = checkoutSession.url;
+                } else {
+                    toast.error("Failed to create checkout session");
                 }
             } catch (err) {
                 console.error(err);
