@@ -30,92 +30,111 @@ function Header() {
 
     return (
         <header>
-            {/* Top Nav */}
-            <div className="flex items-center bg-amazon_blue p-1 flex-grow py-2">
-                {/* Logo */}
-                <div className="mt-2 flex items-center flex-grow sm:flex-grow-0 pt-1 px-4">
+            {/* Mobile-First Design */}
+            <div className="bg-amazon_blue">
+                {/* Row 1: Logo + Cart (Mobile) / Full Header (Desktop) */}
+                <div className="flex items-center justify-between p-3 sm:p-2">
+                    {/* Logo */}
                     <Link href="/">
-                        <h1 className="text-2xl font-bold text-white tracking-wider cursor-pointer font-serif italic">
+                        <h1 className="text-lg sm:text-2xl font-bold text-white tracking-wider cursor-pointer font-serif italic">
                             Brands Hub 49
                         </h1>
                     </Link>
-                </div>
 
-                {/* Location - Hidden on small screens */}
-                <div className="hidden sm:flex items-center text-white text-xs hover:outline hover:outline-1 hover:outline-white p-2 cursor-pointer mx-2">
-                    <div className="text-white pt-3 pr-1">
-                        <MapPin className="h-5 w-5" />
+                    {/* Desktop: Location, Search, Account, Orders, Cart */}
+                    <div className="hidden sm:flex items-center gap-3 flex-grow ml-4">
+                        {/* Location */}
+                        <div className="flex items-center text-white text-xs hover:outline hover:outline-1 hover:outline-white p-2 cursor-pointer">
+                            <MapPin className="h-5 w-5 mr-1" />
+                            <div>
+                                <p className="text-gray-300">Deliver to</p>
+                                <p className="font-bold text-white text-sm">India</p>
+                            </div>
+                        </div>
+
+                        {/* Search Bar - Desktop */}
+                        <form onSubmit={handleSearch} className="flex items-center h-10 rounded-md flex-grow max-w-2xl bg-amazon_yellow hover:bg-amazon_orange transition-colors duration-200">
+                            <select className="h-full bg-gray-100 text-black text-xs px-2 border-r border-gray-300 rounded-l-md outline-none w-auto max-w-[80px]">
+                                <option>All</option>
+                                <option>Luxury</option>
+                                <option>Smart</option>
+                                <option>Sport</option>
+                            </select>
+                            <input
+                                className="p-2 h-full flex-grow rounded-l-none focus:outline-none px-4 text-sm text-black bg-white"
+                                type="text"
+                                placeholder="Search for watches..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <button type="submit" className="h-full px-3 bg-amazon_yellow hover:bg-amazon_orange rounded-r-md flex items-center justify-center transition-colors duration-200">
+                                <Search className="h-6 w-6 text-black" />
+                            </button>
+                        </form>
+
+                        {/* Account */}
+                        <div onClick={() => !session ? signIn() : router.push('/profile')} className="text-white text-xs cursor-pointer hover:underline whitespace-nowrap">
+                            <p className="text-gray-100">{session ? `Hello, ${session.user?.name?.split(' ')[0]}` : "Hello, sign in"}</p>
+                            <p className="font-extrabold text-sm">Account & Lists</p>
+                        </div>
+
+                        {/* Orders */}
+                        <Link href="/orders" className="text-white text-xs cursor-pointer hover:underline whitespace-nowrap">
+                            <p>Returns</p>
+                            <p className="font-extrabold text-sm">& Orders</p>
+                        </Link>
+
+                        {/* Cart */}
+                        <Link href="/checkout">
+                            <div className="relative flex items-center cursor-pointer hover:underline text-white">
+                                <span className="absolute -top-1 -right-1 h-5 w-5 bg-amazon_orange text-center rounded-full text-black font-bold text-xs flex items-center justify-center">
+                                    {items.length}
+                                </span>
+                                <ShoppingCart className="h-10 w-10" />
+                                <p className="hidden lg:inline font-extrabold text-sm ml-2 mt-2">Cart</p>
+                            </div>
+                        </Link>
                     </div>
-                    <div>
-                        <p className="text-gray-300">Deliver to</p>
-                        <p className="font-bold text-white text-sm">India</p>
-                    </div>
-                </div>
 
-                {/* Search Bar - Greenish Theme */}
-                <form onSubmit={handleSearch} className="flex items-center h-10 rounded-md flex-grow bg-amazon_yellow hover:bg-amazon_orange cursor-pointer transition-colors duration-200 mx-2 max-w-2xl">
-                    {/* Category Dropdown (Fake) */}
-                    <select className="hidden sm:block h-full bg-gray-100 text-black text-xs px-2 border-r border-gray-300 rounded-l-md outline-none w-auto max-w-[80px]">
-                        <option>All</option>
-                        <option>Luxury</option>
-                        <option>Smart</option>
-                        <option>Sport</option>
-                    </select>
-
-                    <input
-                        className="p-2 h-full w-6 flex-grow flex-shrink rounded-l-md sm:rounded-l-none focus:outline-none px-2 sm:px-4 text-sm text-black bg-white"
-                        type="text"
-                        placeholder="Search watches..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <button type="submit" className="h-full p-2 bg-amazon_yellow hover:bg-amazon_orange rounded-r-md flex items-center justify-center transition-colors duration-200">
-                        <Search className="h-6 w-6 text-black" />
-                    </button>
-                </form>
-
-                {/* Right Nav */}
-                <div className="text-white flex items-center text-xs space-x-6 mx-6 whitespace-nowrap">
-                    {/* Account */}
-                    <div onClick={() => !session ? signIn() : router.push('/profile')} className="link cursor-pointer hover:underline">
-                        <p className="text-xs text-gray-100">
-                            {session ? `Hello, ${session.user?.name}` : "Hello, sign in"}
-                        </p>
-                        <p className="font-extrabold md:text-sm text-white">Account & Lists</p>
-                    </div>
-
-                    {/* Orders */}
-                    <Link href="/orders" className="link cursor-pointer hover:underline">
-                        <p>Returns</p>
-                        <p className="font-extrabold md:text-sm">& Orders</p>
-                    </Link>
-
-                    {/* Cart */}
-                    <Link href="/checkout">
-                        <div className="relative link flex items-center cursor-pointer hover:underline">
-                            <span className="absolute top-0 right-0 md:right-10 h-4 w-4 bg-amazon_orange text-center rounded-full text-black font-bold">
+                    {/* Mobile: Cart Only */}
+                    <Link href="/checkout" className="sm:hidden">
+                        <div className="relative flex items-center cursor-pointer text-white">
+                            <span className="absolute -top-2 -right-2 h-5 w-5 bg-amazon_orange text-center rounded-full text-black font-bold text-xs flex items-center justify-center">
                                 {items.length}
                             </span>
-                            <ShoppingCart className="h-10 w-10" />
-                            <p className="hidden md:inline font-extrabold md:text-sm mt-2">
-                                Cart
-                            </p>
+                            <ShoppingCart className="h-9 w-9" />
                         </div>
                     </Link>
                 </div>
+
+                {/* Row 2: Search Bar (Mobile Only) */}
+                <div className="sm:hidden px-3 pb-3">
+                    <form onSubmit={handleSearch} className="flex items-center h-12 rounded-lg bg-white shadow-md">
+                        <input
+                            className="p-3 h-full flex-grow rounded-l-lg focus:outline-none text-base text-black bg-white"
+                            type="text"
+                            placeholder="Search for watches..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <button type="submit" className="h-full px-4 bg-amazon_yellow hover:bg-amazon_orange rounded-r-lg flex items-center justify-center transition-colors duration-200">
+                            <Search className="h-6 w-6 text-black" />
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            {/* Bottom Nav */}
-            <div className="flex items-center space-x-3 p-2 pl-6 bg-amazon_blue-light text-white text-sm">
-                <Link href="/" className="link flex items-center font-bold cursor-pointer hover:underline">
+            {/* Bottom Nav - Category Links */}
+            <div className="flex items-center space-x-3 p-2 pl-4 bg-amazon_blue-light text-white text-sm overflow-x-auto">
+                <Link href="/" className="link flex items-center font-bold cursor-pointer hover:underline whitespace-nowrap">
                     <Menu className="h-6 w-6 mr-1" />
                     All
                 </Link>
-                <Link href="/?category=luxury" className="link cursor-pointer hover:underline">Luxury Watches</Link>
-                <Link href="/?category=smart" className="link cursor-pointer hover:underline">Smart Watches</Link>
-                <Link href="/?category=sport" className="link cursor-pointer hover:underline">Sport Series</Link>
-                <Link href="/" className="link cursor-pointer hover:underline">New Arrivals</Link>
-                <p className="link cursor-pointer hover:underline hidden lg:inline-flex">Sell</p>
+                <Link href="/?category=luxury" className="link cursor-pointer hover:underline whitespace-nowrap">Luxury Watches</Link>
+                <Link href="/?category=smart" className="link cursor-pointer hover:underline whitespace-nowrap">Smart Watches</Link>
+                <Link href="/?category=sport" className="link cursor-pointer hover:underline whitespace-nowrap">Sport Series</Link>
+                <Link href="/" className="link cursor-pointer hover:underline whitespace-nowrap">New Arrivals</Link>
+                <p className="link cursor-pointer hover:underline hidden lg:inline-flex whitespace-nowrap">Sell</p>
             </div>
         </header>
     );
