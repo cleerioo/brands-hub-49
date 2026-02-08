@@ -68,12 +68,13 @@ function Checkout() {
     const handleSelectAddress = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const addressId = e.target.value;
         if (addressId === "new") {
-            setShippingAddress({ fullName: "", address: "", city: "", postalCode: "", country: "" });
+            setShippingAddress({ fullName: "", phone: "", address: "", city: "", postalCode: "", country: "" });
         } else {
             const selected = savedAddresses.find((addr: any) => addr._id === addressId);
             if (selected) {
                 setShippingAddress({
                     fullName: selected.fullName,
+                    phone: selected.phone || "",
                     address: selected.street,
                     city: selected.city,
                     postalCode: selected.postalCode,
@@ -259,6 +260,16 @@ function Checkout() {
                                     value={shippingAddress.fullName}
                                     onChange={handleAddressChange}
                                     className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                />
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    placeholder="Phone Number (10 digits)"
+                                    value={shippingAddress.phone}
+                                    onChange={handleAddressChange}
+                                    className="border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                    pattern="[0-9]{10}"
+                                    maxLength={10}
                                 />
                                 <input
                                     type="text"
