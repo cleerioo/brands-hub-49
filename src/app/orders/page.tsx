@@ -44,13 +44,13 @@ function Orders() {
                 <div className="mt-5 space-y-4">
                     {orders?.map((order) => (
                         <Order
-                            key={order.id}
-                            id={order.id}
+                            key={order._id}
+                            id={order.razorpayOrderId || order._id}
                             amount={order.amount}
-                            amountShipping={order.amountShipping}
+                            amountShipping={0}
                             items={order.items}
                             timestamp={order.timestamp}
-                            images={order.images}
+                            images={order.items.map((item: any) => item.image)}
                             status={order.status}
                             trackingId={order.trackingId}
                             courierName={order.courierName}
