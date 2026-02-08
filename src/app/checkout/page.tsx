@@ -28,9 +28,9 @@ function CheckoutItem({ item }: { item: any }) {
                 </div>
                 <p className="text-xs my-2 line-clamp-3 text-gray-500">{item.description}</p>
                 <div className="font-bold">
-                    {new Intl.NumberFormat("en-US", {
+                    {new Intl.NumberFormat("en-IN", {
                         style: "currency",
-                        currency: "USD",
+                        currency: "INR",
                     }).format(item.price)}
                 </div>
                 {item.hasPrime && (
@@ -314,9 +314,9 @@ function Checkout() {
                         <h2 className="whitespace-nowrap">
                             Subtotal ({items.length} items):
                             <span className="font-bold ml-1">
-                                {new Intl.NumberFormat("en-US", {
+                                {new Intl.NumberFormat("en-IN", {
                                     style: "currency",
-                                    currency: "USD",
+                                    currency: "INR",
                                 }).format(total)}
                             </span>
                         </h2>
