@@ -86,6 +86,7 @@ function Checkout() {
 
     const [shippingAddress, setShippingAddress] = useState({
         fullName: "",
+        phone: "",
         address: "",
         city: "",
         postalCode: "",
@@ -105,9 +106,9 @@ function Checkout() {
             return;
         }
 
-        const { fullName, address, city, postalCode, country } = shippingAddress;
-        if (!fullName || !address || !city || !postalCode || !country) {
-            toast.error("Please fill in all shipping details");
+        const { fullName, phone, address, city, postalCode, country } = shippingAddress;
+        if (!fullName || !phone || !address || !city || !postalCode || !country) {
+            toast.error("Please fill in all shipping details including phone number");
             return;
         }
 
@@ -172,7 +173,26 @@ function Checkout() {
                     prefill: {
                         name: fullName,
                         email: session.user?.email,
-                        contact: "", // Could ask user for phone
+                        contact: phone,
+                    },
+                    config: {
+                        display: {
+                            blocks: {
+                                banks: {
+                                    name: "Pay using",
+                                    instruments: [
+                                        { method: "upi" },
+                                        { method: "card" },
+                                        { method: "netbanking" },
+                                        { method: "wallet" },
+                                    ],
+                                },
+                            },
+                            sequence: ["block.banks"],
+                            preferences: {
+                                show_default_blocks: true,
+                            },
+                        },
                     },
                     theme: {
                         color: "#F3A847", // Amazon/Brand Color
