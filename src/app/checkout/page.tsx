@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { useEffect, useState } from "react";
+import * as gtag from "@/lib/gtag";
 
 function CheckoutItem({ item }: { item: any }) {
     const { removeFromCart } = useCart();
@@ -161,6 +162,12 @@ function Checkout() {
 
                             if (verifyRes.ok) {
                                 toast.success("Payment Successful!");
+                                gtag.event({
+                                    action: "purchase",
+                                    category: "ecommerce",
+                                    label: "Razorpay Order",
+                                    value: total,
+                                });
                                 clearCart();
                                 router.push("/success");
                             } else {
@@ -216,6 +223,12 @@ function Checkout() {
         } else if (paymentMethod === "cod") {
             // COD Logic
             toast.success("Order Placed Successfully!");
+            gtag.event({
+                action: "purchase",
+                category: "ecommerce",
+                label: "COD Order",
+                value: total,
+            });
             clearCart();
             router.push("/success");
         }
