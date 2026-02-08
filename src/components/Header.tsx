@@ -53,9 +53,9 @@ function Header() {
                 </div>
 
                 {/* Search Bar - Greenish Theme */}
-                <form onSubmit={handleSearch} className="hidden sm:flex items-center h-10 rounded-md flex-grow bg-amazon_yellow hover:bg-amazon_orange cursor-pointer transition-colors duration-200">
+                <form onSubmit={handleSearch} className="flex items-center h-10 rounded-md flex-grow bg-amazon_yellow hover:bg-amazon_orange cursor-pointer transition-colors duration-200 mx-2 max-w-2xl">
                     {/* Category Dropdown (Fake) */}
-                    <select className="h-full bg-gray-100 text-black text-xs px-2 border-r border-gray-300 rounded-l-md outline-none w-auto max-w-[80px]">
+                    <select className="hidden sm:block h-full bg-gray-100 text-black text-xs px-2 border-r border-gray-300 rounded-l-md outline-none w-auto max-w-[80px]">
                         <option>All</option>
                         <option>Luxury</option>
                         <option>Smart</option>
@@ -63,9 +63,9 @@ function Header() {
                     </select>
 
                     <input
-                        className="p-2 h-full w-6 flex-grow flex-shrink rounded-l-none focus:outline-none px-4 text-black bg-white"
+                        className="p-2 h-full w-6 flex-grow flex-shrink rounded-l-md sm:rounded-l-none focus:outline-none px-2 sm:px-4 text-sm text-black bg-white"
                         type="text"
-                        placeholder="Search for watches..."
+                        placeholder="Search watches..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
