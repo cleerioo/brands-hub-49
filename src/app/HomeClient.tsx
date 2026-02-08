@@ -4,24 +4,54 @@ import Banner from "../components/Banner";
 import Header from "../components/Header";
 import ProductFeed from "../components/ProductFeed";
 import FilterSidebar from "../components/FilterSidebar";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Product } from "../providers/CartProvider";
+import { useSearchParams } from "next/navigation";
 
 interface HomeClientProps {
     initialProducts: Product[];
 }
 
 export default function HomeClient({ initialProducts }: HomeClientProps) {
+    const searchParams = useSearchParams();
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [priceRange, setPriceRange] = useState<[number, number]>([0, 200000]);
     const [minRating, setMinRating] = useState(0);
     const [sortOrder, setSortOrder] = useState("featured");
+    const [searchTerm, setSearchTerm] = useState("");
 
     // Extract unique categories
     const categories = useMemo(() => Array.from(new Set(initialProducts.map(p => p.category))), [initialProducts]);
 
+    // Read URL parameters and set filters
+    useEffect(() => {
+        const category = searchParams.get("category");
+        const search = searchParams.get("search");
+
+        if (category) {
+            setSelectedCategories([category]);
+        } else {
+            setSelectedCategories([]);
+        }
+
+        if (search) {
+            setSearchTerm(search);
+        } else {
+            setSearchTerm("");
+        }
+    }, [searchParams]);
+
     const filteredProducts = useMemo(() => {
         let result = initialProducts;
+
+        // Filter by Search Term
+        if (searchTerm) {
+            result = result.filter(p =>
+                p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.category.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
 
         // Filter by Category
         if (selectedCategories.length > 0) {

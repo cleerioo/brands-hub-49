@@ -114,7 +114,7 @@ function Header() {
                 <Link href="/?category=luxury" className="link cursor-pointer hover:underline">Luxury Watches</Link>
                 <Link href="/?category=smart" className="link cursor-pointer hover:underline">Smart Watches</Link>
                 <Link href="/?category=sport" className="link cursor-pointer hover:underline">Sport Series</Link>
-                <p className="link cursor-pointer hover:underline">New Arrivals</p>
+                <Link href="/" className="link cursor-pointer hover:underline">New Arrivals</Link>
                 <p className="link cursor-pointer hover:underline hidden lg:inline-flex">Sell</p>
             </div>
         </header>
