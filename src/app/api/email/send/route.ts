@@ -41,13 +41,13 @@ export async function POST(req: NextRequest) {
                                 ${item.title} x ${item.quantity || 1}
                             </td>
                             <td style="padding: 10px; text-align: right; border-bottom: 1px solid #eee;">
-                                $${item.price}
+                                ₹${item.price}
                             </td>
                         </tr>
                     `).join('')}
                 </table>
                 
-                <h3 style="text-align: right; margin-top: 20px;">Total: $${amount}</h3>
+                <h3 style="text-align: right; margin-top: 20px;">Total: ₹${amount}</h3>
                 
                 <p style="margin-top: 30px; font-size: 12px; color: #777;">
                     This is a demo email from Amazon Clone.

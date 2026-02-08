@@ -151,9 +151,9 @@ function Product({ id, title, price, description, category, image, rating = 4, r
             <p className="text-sm my-2 line-clamp-2 text-gray-500 font-light min-h-[40px]">{description}</p>
 
             <div className="mt-2 mb-4 font-bold text-2xl text-gray-800">
-                {new Intl.NumberFormat("en-US", {
+                {new Intl.NumberFormat("en-IN", {
                     style: "currency",
-                    currency: "USD",
+                    currency: "INR",
                 }).format(price)}
             </div>
 
