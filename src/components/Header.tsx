@@ -4,7 +4,9 @@ import {
     Menu,
     Search,
     ShoppingCart,
-    MapPin
+    MapPin,
+    User,
+    Package
 } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "../providers/CartProvider";
@@ -32,7 +34,7 @@ function Header() {
         <header>
             {/* Mobile-First Design */}
             <div className="bg-amazon_blue">
-                {/* Row 1: Logo + Cart (Mobile) / Full Header (Desktop) */}
+                {/* Row 1: Logo + Account + Orders + Cart (Mobile & Desktop) */}
                 <div className="flex items-center justify-between p-3 sm:p-2">
                     {/* Logo */}
                     <Link href="/">
@@ -96,15 +98,31 @@ function Header() {
                         </Link>
                     </div>
 
-                    {/* Mobile: Cart Only */}
-                    <Link href="/checkout" className="sm:hidden">
-                        <div className="relative flex items-center cursor-pointer text-white">
-                            <span className="absolute -top-2 -right-2 h-5 w-5 bg-amazon_orange text-center rounded-full text-black font-bold text-xs flex items-center justify-center">
-                                {items.length}
-                            </span>
-                            <ShoppingCart className="h-9 w-9" />
+                    {/* Mobile: Account + Orders + Cart */}
+                    <div className="sm:hidden flex items-center gap-3">
+                        {/* Account Icon */}
+                        <div onClick={() => !session ? signIn() : router.push('/profile')} className="flex flex-col items-center cursor-pointer text-white">
+                            <User className="h-6 w-6" />
+                            <span className="text-xs mt-0.5">{session ? session.user?.name?.split(' ')[0] : "Sign in"}</span>
                         </div>
-                    </Link>
+
+                        {/* Orders Icon */}
+                        <Link href="/orders" className="flex flex-col items-center cursor-pointer text-white">
+                            <Package className="h-6 w-6" />
+                            <span className="text-xs mt-0.5">Orders</span>
+                        </Link>
+
+                        {/* Cart Icon */}
+                        <Link href="/checkout" className="flex flex-col items-center cursor-pointer text-white relative">
+                            <div className="relative">
+                                <span className="absolute -top-2 -right-2 h-5 w-5 bg-amazon_orange text-center rounded-full text-black font-bold text-xs flex items-center justify-center">
+                                    {items.length}
+                                </span>
+                                <ShoppingCart className="h-6 w-6" />
+                            </div>
+                            <span className="text-xs mt-0.5">Cart</span>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Row 2: Search Bar (Mobile Only) */}
