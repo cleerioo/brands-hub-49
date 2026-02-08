@@ -29,15 +29,14 @@ export const authOptions: NextAuthOptions = {
                 otp: { label: "OTP", type: "text" }
             },
             async authorize(credentials, req) {
-                // Email/Password Logic
-                if (credentials?.username === "user@example.com" && credentials?.password === "password") {
-                    return { id: "1", name: "Demo User", email: "user@example.com" };
+                // Admin Credentials
+                if (credentials?.username === "admin@brandshub.com" && credentials?.password === "admin123") {
+                    return { id: "0", name: "Admin User", email: "admin@brandshub.com", role: "admin" };
                 }
 
-                // OTP Logic 
-                // Any mobile number is accepted, OTP must be 123456
-                if (credentials?.mobile && credentials?.otp === "123456") {
-                    return { id: "2", name: "Mobile User", email: "mobile-user@brands.com", image: null };
+                // Email/Password Logic
+                if (credentials?.username === "user@example.com" && credentials?.password === "password") {
+                    return { id: "1", name: "Demo User", email: "user@example.com", role: "user" };
                 }
 
                 return null;
@@ -49,16 +48,16 @@ export const authOptions: NextAuthOptions = {
     },
     secret: process.env.NEXTAUTH_SECRET || "secret",
     callbacks: {
-        async signIn({ user, account, profile }) {
-            // Allow Google sign-in without database operations
-            // This prevents OAuthCallback errors from database connection issues
-            if (account?.provider === "google") {
-                return true;
+        async jwt({ token, user }: any) {
+            if (user) {
+                token.role = user.role;
             }
-            return true; // Allow other providers (Credentials) to pass
+            return token;
         },
-        async session({ session, token }) {
-            // You can add user ID from DB here if needed
+        async session({ session, token }: any) {
+            if (session?.user) {
+                session.user.role = token.role;
+            }
             return session;
         }
     }

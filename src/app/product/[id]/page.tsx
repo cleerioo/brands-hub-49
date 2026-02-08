@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { Star, ShoppingCart, MapPin, ChevronLeft } from "lucide-react";
 import { watches } from "@/data/watches";
 import { useCart } from "@/providers/CartProvider";
@@ -12,6 +13,37 @@ export default function ProductPage() {
     const params = useParams();
     const router = useRouter();
     const { addToCart } = useCart();
+    const [pincode, setPincode] = useState("");
+    const [isChecking, setIsChecking] = useState(false);
+    const [serviceability, setServiceability] = useState<{ available: boolean; message: string } | null>(null);
+
+    const handleCheckPincode = () => {
+        setIsChecking(true);
+        setServiceability(null);
+
+        // Mock API Call simulation
+        setTimeout(() => {
+            const isValid = pincode.length === 6 && ["11", "56", "40", "60", "70", "38"].includes(pincode.substring(0, 2)); // Mock valid prefixes
+
+            // For demo purposes, we'll make most pincodes valid unless they start with 99
+            const isDeliverable = !pincode.startsWith("99");
+
+            if (isDeliverable) {
+                const deliveryDate = new Date();
+                deliveryDate.setDate(deliveryDate.getDate() + 4);
+                setServiceability({
+                    available: true,
+                    message: `✅ Deliverable by ${deliveryDate.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}`
+                });
+            } else {
+                setServiceability({
+                    available: false,
+                    message: "❌ Not serviceable at this location."
+                });
+            }
+            setIsChecking(false);
+        }, 1000);
+    };
 
     // Handle potential standard/array param types safely
     const id = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -123,6 +155,36 @@ export default function ProductPage() {
                                 <MapPin className="h-3 w-3 mr-1" />
                                 <span>Deliver to India</span>
                             </div>
+                        </div>
+
+                        {/* Pincode Check */}
+                        <div className="py-2">
+                            <div className="flex items-center space-x-2">
+                                <MapPin className="h-4 w-4 text-gray-500" />
+                                <span className="text-sm font-medium text-gray-700">Select Delivery Location</span>
+                            </div>
+                            <div className="flex mt-2 space-x-2">
+                                <input
+                                    type="text"
+                                    placeholder="Enter Pincode"
+                                    maxLength={6}
+                                    value={pincode}
+                                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                                    className="w-full border border-gray-300 rounded-sm px-2 py-1 text-sm focus:ring-2 focus:ring-amazon_orange outline-none"
+                                />
+                                <button
+                                    onClick={handleCheckPincode}
+                                    disabled={pincode.length !== 6 || isChecking}
+                                    className="text-sm text-amazon_blue font-medium hover:text-orange-600 disabled:text-gray-400"
+                                >
+                                    {isChecking ? "Checking..." : "Apply"}
+                                </button>
+                            </div>
+                            {serviceability && (
+                                <div className={`text-xs mt-1 ${serviceability.available ? "text-green-700" : "text-red-600"}`}>
+                                    {serviceability.message}
+                                </div>
+                            )}
                         </div>
 
                         <div className="text-lg text-green-700 font-medium">In Stock</div>

@@ -11,12 +11,19 @@ function Orders() {
 
     useEffect(() => {
         if (session) {
-            // Fetch orders from LocalStorage
-            const storedOrders = JSON.parse(localStorage.getItem("amazon-clone-orders") || "[]");
-            // Filter by current user email
-            const userOrders = storedOrders.filter((order: any) => order.userEmail === session.user?.email);
-            // Sort by date desc
-            setOrders(userOrders.sort((a: any, b: any) => b.timestamp - a.timestamp));
+            const fetchOrders = async () => {
+                try {
+                    const res = await fetch("/api/user/orders");
+                    if (res.ok) {
+                        const data = await res.json();
+                        setOrders(data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching orders:", error);
+                }
+            };
+
+            fetchOrders();
         } else {
             setOrders([]);
         }
@@ -44,6 +51,9 @@ function Orders() {
                             items={order.items}
                             timestamp={order.timestamp}
                             images={order.images}
+                            status={order.status}
+                            trackingId={order.trackingId}
+                            courierName={order.courierName}
                             shippingAddress={order.shippingAddress}
                         />
                     ))}

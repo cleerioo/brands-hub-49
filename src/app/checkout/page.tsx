@@ -7,7 +7,7 @@ import { Star } from "lucide-react";
 import { Toaster, toast } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { loadStripe } from "@stripe/stripe-js";
+import Script from "next/script";
 import { useEffect, useState } from "react";
 
 function CheckoutItem({ item }: { item: any }) {
@@ -51,6 +51,8 @@ function Checkout() {
     const { items, total, clearCart } = useCart();
     const { data: session } = useSession();
     const router = useRouter();
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState("card");
     const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
 
     useEffect(() => {
@@ -87,10 +89,8 @@ function Checkout() {
         address: "",
         city: "",
         postalCode: "",
-        country: ""
+        country: "",
     });
-
-    const [paymentMethod, setPaymentMethod] = useState("card");
 
     const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setShippingAddress({
@@ -101,75 +101,102 @@ function Checkout() {
 
     const handlePlaceOrder = async () => {
         if (!session) {
-            toast.error("Please sign in to place an order");
+            router.push("/auth/signin?callbackUrl=/checkout");
             return;
         }
 
-        // Validate Address only if using COD or other manual methods, 
-        // but for Stripe, address is collected on Stripe page (optional).
-        // Let's keep manual validation for address consistency for now.
         const { fullName, address, city, postalCode, country } = shippingAddress;
         if (!fullName || !address || !city || !postalCode || !country) {
             toast.error("Please fill in all shipping details");
             return;
         }
 
-        if (paymentMethod === "card") {
+        if (paymentMethod === "card" || paymentMethod === "upi") {
+            setIsProcessing(true);
             try {
-                const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
-                const response = await fetch("/api/create-checkout-session", {
+                // 1. Create Order on Backend
+                const response = await fetch("/api/create-razorpay-order", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
+                        amount: total,
                         items: items,
                         email: session.user?.email,
+                        shippingAddress: shippingAddress,
                     }),
                 });
 
-                const checkoutSession = await response.json();
-
-                // Save Local Order as 'Pending' or similar? 
-                // For now, let's rely on webhook or success page logic. 
-                // But since we don't have webhooks set up, the 'success' page won't verify backend.
-                // We'll persist order locally as 'Processing' to show immediate feedback?
-                // Actually, let's stick to standard flow: Redirect to Stripe.
-
-                // Redirect to Stripe Checkout using the URL from the API
-                if (checkoutSession.url) {
-                    window.location.href = checkoutSession.url;
-                } else {
-                    toast.error("Failed to create checkout session");
+                if (!response.ok) {
+                    throw new Error("Failed to create order");
                 }
+
+                const order = await response.json();
+
+                // 2. Initialize Razorpay Options
+                const options = {
+                    key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                    amount: order.amount,
+                    currency: order.currency,
+                    name: "Brands Hub 49",
+                    description: "Order Payment",
+                    order_id: order.id,
+                    handler: async function (response: any) {
+                        try {
+                            const verifyRes = await fetch("/api/orders/verify", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    dbOrderId: order.dbOrderId,
+                                }),
+                            });
+
+                            if (verifyRes.ok) {
+                                toast.success("Payment Successful!");
+                                clearCart();
+                                router.push("/success");
+                            } else {
+                                toast.error("Payment verification failed");
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            toast.error("Payment verification failed");
+                        }
+                    },
+                    prefill: {
+                        name: fullName,
+                        email: session.user?.email,
+                        contact: "", // Could ask user for phone
+                    },
+                    theme: {
+                        color: "#F3A847", // Amazon/Brand Color
+                    },
+                };
+
+                // 4. Open Razorpay Modal
+                const paymentObject = new (window as any).Razorpay(options);
+                paymentObject.open();
+                paymentObject.on("payment.failed", function (response: any) {
+                    toast.error(response.error.description);
+                    setIsProcessing(false);
+                });
+
             } catch (err) {
                 console.error(err);
-                toast.error("Stripe Checkout Failed");
+                toast.error("Payment initialization failed");
+                setIsProcessing(false);
             }
-        } else {
-            // Existing Logic for COD/Manual
-            const newOrder = {
-                id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-                userEmail: session.user?.email,
-                amount: total,
-                amountShipping: 0, // Mock shipping
-                items: items,
-                timestamp: Date.now(),
-                images: items.map(item => item.image),
-                shippingAddress: shippingAddress,
-                paymentMethod: paymentMethod
-            };
-
-            // Save to LocalStorage
-            const existingOrders = JSON.parse(localStorage.getItem("amazon-clone-orders") || "[]");
-            existingOrders.push(newOrder);
-            localStorage.setItem("amazon-clone-orders", JSON.stringify(existingOrders));
-
-            // Clear Cart and Redirect
-            clearCart();
+        } else if (paymentMethod === "cod") {
+            // COD Logic
             toast.success("Order Placed Successfully!");
-            router.push("/orders");
+            clearCart();
+            router.push("/success");
         }
     };
 
@@ -297,13 +324,14 @@ function Checkout() {
                         <button
                             onClick={handlePlaceOrder}
                             role="link"
-                            className={`bg-amazon_yellow border border-yellow-500 rounded-sm py-2 px-4 shadow-sm hover:bg-amazon_orange active:from-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 font-medium mt-2  ${!session ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                            className="bg-amazon_yellow border border-yellow-500 rounded-sm py-2 px-4 shadow-sm hover:bg-amazon_orange active:from-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 font-medium mt-2 cursor-pointer"
                         >
-                            {!session ? "Sign in to Checkout" : "Place Order"}
+                            {isProcessing ? "Processing..." : "Place Order"}
                         </button>
                     </div>
                 )}
             </main>
+            <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
         </div>
     );
 }
